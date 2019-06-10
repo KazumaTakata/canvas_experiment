@@ -63,6 +63,17 @@ let circleProp = {
   landingNode: 'node1'
 }
 
+let enemyProp = {
+  position: {
+    x: nodes['node1'].position.x,
+    y: nodes['node1'].position.y
+  },
+  velocity: { x: 1, y: 0 },
+  line: { s: 'node1', t: 'node2' },
+  stopped: false,
+  landingNode: 'node1'
+}
+
 function addNode(nodeName, position) {
   nodes[nodeName] = { position: position, conn: {} }
 }
@@ -261,13 +272,22 @@ function circleMoveInOutrange(nodes, circleProp, x_or_y, min_value, max_value) {
       circleProp.line.s = circleProp.line.t
       circleProp.line.t = next
     } else {
-      calibratePosition(circleProp, x_or_y, min_value, max_value)
-      circleProp.velocity.x = 0
-      circleProp.velocity.y = 0
-      circleProp.stopped = true
-      circleProp.nextMove = undefined
+      nodeArrive(circleProp, x_or_y, min_value, max_value)
+      // calibratePosition(circleProp, x_or_y, min_value, max_value)
+      // circleProp.velocity.x = 0
+      // circleProp.velocity.y = 0
+      // circleProp.stopped = true
+      // circleProp.nextMove = undefined
     }
   }
+}
+
+function nodeArrive(circleProp, x_or_y, min_value, max_value) {
+  calibratePosition(circleProp, x_or_y, min_value, max_value)
+  circleProp.velocity.x = 0
+  circleProp.velocity.y = 0
+  circleProp.stopped = true
+  circleProp.nextMove = undefined
 }
 
 function calibratePosition(circleProp, x_or_y, min_value, max_value) {
@@ -296,19 +316,84 @@ function drawCircle(nodes, circleProp, x_or_y) {
   }
 }
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max))
+}
+
+function drawEnemyCircle(nodes, circleProp, x_or_y) {
+  if (circleProp.stopped) {
+    circleProp.stopped = false
+    let connectedNodes = Object.keys(nodes[circleProp.landingNode].conn)
+    // choose next node randomly.
+    let index = getRandomInt(connectedNodes.length)
+    let node = connectedNodes[index]
+    let direction = nodes[circleProp.landingNode].conn[node].direction
+    circleProp.line.s = circleProp.landingNode
+    circleProp.line.t = node
+
+    switch (direction) {
+      case 'ArrowLeft':
+        circleProp.velocity.x = -5
+        circleProp.velocity.y = 0
+
+        break
+      case 'ArrowRight':
+        circleProp.velocity.x = 5
+        circleProp.velocity.y = 0
+
+        break
+      case 'ArrowUp':
+        circleProp.velocity.x = 0
+        circleProp.velocity.y = -5
+
+        break
+      case 'ArrowDown':
+        circleProp.velocity.x = 0
+        circleProp.velocity.y = 5
+
+        break
+    }
+  }
+
+  let max_min = getMax(nodes, circleProp, x_or_y)
+  let max_value = max_min[0]
+  let min_value = max_min[1]
+
+  if (
+    circleProp.position[x_or_y] >= min_value.value &&
+    circleProp.position[x_or_y] <= max_value.value
+  ) {
+    circleProp.position.x += circleProp.velocity.x
+    circleProp.position.y += circleProp.velocity.y
+  } else {
+    nodeArrive(circleProp, x_or_y, min_value, max_value)
+  }
+}
+
 function Draw() {
   ctx.clearRect(0, 0, dimension[0], dimension[1])
 
   drawCurvedLine(Points, 5)
 
-  if (circleProp.velocity.y == 0) {
-    drawCircle(nodes, circleProp, 'x')
+  // if (circleProp.velocity.y == 0) {
+  //   drawCircle(nodes, circleProp, 'x')
+  // } else {
+  //   drawCircle(nodes, circleProp, 'y')
+  // }
+  // ctx.beginPath()
+  // ctx.arc(circleProp.position.x, circleProp.position.y, 20, 0, 2 * Math.PI)
+  // ctx.stroke()
+
+  if (enemyProp.velocity.y == 0) {
+    // drawCircle(nodes, circleProp, 'x')
+    drawEnemyCircle(nodes, enemyProp, 'x')
   } else {
-    drawCircle(nodes, circleProp, 'y')
+    // drawCircle(nodes, circleProp, 'y')
+    drawEnemyCircle(nodes, enemyProp, 'y')
   }
 
   ctx.beginPath()
-  ctx.arc(circleProp.position.x, circleProp.position.y, 20, 0, 2 * Math.PI)
+  ctx.arc(enemyProp.position.x, enemyProp.position.y, 20, 0, 2 * Math.PI)
   ctx.stroke()
 
   window.requestAnimationFrame(Draw)
