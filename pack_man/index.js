@@ -375,26 +375,25 @@ function Draw() {
 
   drawCurvedLine(Points, 5)
 
-  // if (circleProp.velocity.y == 0) {
-  //   drawCircle(nodes, circleProp, 'x')
-  // } else {
-  //   drawCircle(nodes, circleProp, 'y')
-  // }
-  // ctx.beginPath()
-  // ctx.arc(circleProp.position.x, circleProp.position.y, 20, 0, 2 * Math.PI)
-  // ctx.stroke()
-
-  if (enemyProp.velocity.y == 0) {
-    // drawCircle(nodes, circleProp, 'x')
-    drawEnemyCircle(nodes, enemyProp, 'x')
+  if (circleProp.velocity.y == 0) {
+    drawCircle(nodes, circleProp, 'x')
   } else {
-    // drawCircle(nodes, circleProp, 'y')
-    drawEnemyCircle(nodes, enemyProp, 'y')
+    drawCircle(nodes, circleProp, 'y')
   }
-
   ctx.beginPath()
-  ctx.arc(enemyProp.position.x, enemyProp.position.y, 20, 0, 2 * Math.PI)
+  ctx.arc(circleProp.position.x, circleProp.position.y, 20, 0, 2 * Math.PI)
   ctx.stroke()
+
+  // draw enemy
+  // if (enemyProp.velocity.y == 0) {
+  //   drawEnemyCircle(nodes, enemyProp, 'x')
+  // } else {
+  //   drawEnemyCircle(nodes, enemyProp, 'y')
+  // }
+
+  // ctx.beginPath()
+  // ctx.arc(enemyProp.position.x, enemyProp.position.y, 20, 0, 2 * Math.PI)
+  // ctx.stroke()
 
   window.requestAnimationFrame(Draw)
 }
